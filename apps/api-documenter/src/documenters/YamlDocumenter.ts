@@ -91,9 +91,8 @@ export class YamlDocumenter {
   /** @virtual */
   protected onGetTocRoot(): IYamlTocItem {
     return {
-      name: 'SharePoint Framework reference',
-      href: '~/overview/sharepoint.md',
-      items: [ ]
+      name: 'Your Custom ToC',
+      items: []
     };
   }
 

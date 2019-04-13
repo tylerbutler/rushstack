@@ -1,6 +1,5 @@
 items:
-  - name: SharePoint Framework reference
-    href: ~/overview/sharepoint.md
+  - name: Your Custom ToC
     items:
       - name: api-documenter-test
         uid: api-documenter-test
