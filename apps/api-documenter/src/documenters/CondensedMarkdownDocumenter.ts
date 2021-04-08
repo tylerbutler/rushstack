@@ -54,7 +54,7 @@ import { DocTableRow } from '../nodes/DocTableRow';
 import { DocTableCell } from '../nodes/DocTableCell';
 import { DocNoteBox } from '../nodes/DocNoteBox';
 import { Utilities } from '../utils/Utilities';
-import { CustomMarkdownEmitter } from '../markdown/CustomMarkdownEmitter';
+import { CondensedMarkdownEmitter } from '../markdown/CondensedMarkdownEmitter';
 import { PluginLoader } from '../plugin/PluginLoader';
 import {
   IMarkdownDocumenterFeatureOnBeforeWritePageArgs,
@@ -79,6 +79,7 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
     super(options);
     this._tsdocConfiguration = CustomDocNodes.configuration;
     this._frontMatter = new FrontMatter();
+    this._markdownEmitter = new CondensedMarkdownEmitter(this._apiModel);
 
     this._uriRoot = '/';
     if (this._documenterConfig && this._documenterConfig.uriRoot !== undefined) {
@@ -892,19 +893,19 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
     }
   }
 
-  protected _createParagraphForTypeExcerpt(excerpt: Excerpt): DocParagraph {
-    const configuration: TSDocConfiguration = this._tsdocConfiguration;
+  // protected _createParagraphForTypeExcerpt(excerpt: Excerpt): DocParagraph {
+  //   const configuration: TSDocConfiguration = this._tsdocConfiguration;
 
-    const paragraph: DocParagraph = new DocParagraph({ configuration });
+  //   const paragraph: DocParagraph = new DocParagraph({ configuration });
 
-    if (!excerpt.text.trim()) {
-      paragraph.appendNode(new DocPlainText({ configuration, text: '(not declared)' }));
-    } else {
-      this._appendExcerptWithHyperlinks(paragraph, excerpt);
-    }
+  //   if (!excerpt.text.trim()) {
+  //     paragraph.appendNode(new DocPlainText({ configuration, text: '(not declared)' }));
+  //   } else {
+  //     this._appendExcerptWithHyperlinks(paragraph, excerpt);
+  //   }
 
-    return paragraph;
-  }
+  //   return paragraph;
+  // }
 
   protected _appendExcerptWithHyperlinks(docNodeContainer: DocNodeContainer, excerpt: Excerpt): void {
     const configuration: TSDocConfiguration = this._tsdocConfiguration;
@@ -940,39 +941,39 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
     }
   }
 
-  protected _appendExcerptTokenWithHyperlinks(docNodeContainer: DocNodeContainer, token: ExcerptToken): void {
-    const configuration: TSDocConfiguration = this._tsdocConfiguration;
+  // protected _appendExcerptTokenWithHyperlinks(docNodeContainer: DocNodeContainer, token: ExcerptToken): void {
+  //   const configuration: TSDocConfiguration = this._tsdocConfiguration;
 
-    for (const token of excerpt.spannedTokens) {
-      // Markdown doesn't provide a standardized syntax for hyperlinks inside code spans, so we will render
-      // the type expression as DocPlainText.  Instead of creating multiple DocParagraphs, we can simply
-      // discard any newlines and let the renderer do normal word-wrapping.
-      const unwrappedTokenText: string = token.text.replace(/[\r\n]+/g, ' ');
+  //   for (const token of excerpt.spannedTokens) {
+  //     // Markdown doesn't provide a standardized syntax for hyperlinks inside code spans, so we will render
+  //     // the type expression as DocPlainText.  Instead of creating multiple DocParagraphs, we can simply
+  //     // discard any newlines and let the renderer do normal word-wrapping.
+  //     const unwrappedTokenText: string = token.text.replace(/[\r\n]+/g, ' ');
 
-      // If it's hyperlinkable, then append a DocLinkTag
-      if (token.kind === ExcerptTokenKind.Reference && token.canonicalReference) {
-        const apiItemResult: IResolveDeclarationReferenceResult = this._apiModel.resolveDeclarationReference(
-          token.canonicalReference,
-          undefined
-        );
+  //     // If it's hyperlinkable, then append a DocLinkTag
+  //     if (token.kind === ExcerptTokenKind.Reference && token.canonicalReference) {
+  //       const apiItemResult: IResolveDeclarationReferenceResult = this._apiModel.resolveDeclarationReference(
+  //         token.canonicalReference,
+  //         undefined
+  //       );
 
-        if (apiItemResult.resolvedApiItem) {
-          docNodeContainer.appendNode(
-            new DocLinkTag({
-              configuration,
-              tagName: '@link',
-              linkText: unwrappedTokenText,
-              urlDestination: this._getLinkFilenameForApiItem(apiItemResult.resolvedApiItem)
-            })
-          );
-          continue;
-        }
-      }
+  //       if (apiItemResult.resolvedApiItem) {
+  //         docNodeContainer.appendNode(
+  //           new DocLinkTag({
+  //             configuration,
+  //             tagName: '@link',
+  //             linkText: unwrappedTokenText,
+  //             urlDestination: this._getLinkFilenameForApiItem(apiItemResult.resolvedApiItem)
+  //           })
+  //         );
+  //         continue;
+  //       }
+  //     }
 
-      // Otherwise append non-hyperlinked text
-      docNodeContainer.appendNode(new DocPlainText({ configuration, text: unwrappedTokenText }));
-    }
-  }
+  //     // Otherwise append non-hyperlinked text
+  //     docNodeContainer.appendNode(new DocPlainText({ configuration, text: unwrappedTokenText }));
+  //   }
+  // }
 
   protected _createTitleCell(apiItem: ApiItem): DocTableCell {
     const configuration: TSDocConfiguration = this._tsdocConfiguration;
@@ -996,7 +997,7 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
     let apiMembers: ReadonlyArray<ApiItem> = item.members;
     const mdEmitter = this._markdownEmitter;
 
-    var extractSummary = function (docComment: DocComment): string {
+    let extractSummary = (docComment: DocComment): string => {
       const tmpStrBuilder: StringBuilder = new StringBuilder();
       const summary: DocSection = docComment!.summarySection;
       mdEmitter.emit(tmpStrBuilder, summary, {
@@ -1042,10 +1043,14 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
       if (element.displayName === '') {
         return;
       }
-      if (!this._frontMatter.members[element.kind]) {
-        this._frontMatter.members[element.kind] = {};
+      if (this._frontMatter && this._frontMatter.members) {
+        if (!this._frontMatter.members.get(element.kind)) {
+          this._frontMatter.members.set(element.kind, new Map<string, string>());
+        }
+        this._frontMatter.members
+          .get(element.kind)
+          ?.set(element.displayName, this._getLinkFilenameForApiItem(element));
       }
-      this._frontMatter.members[element.kind][element.displayName] = this._getLinkFilenameForApiItem(element);
     });
 
     const pkg: ApiPackage | undefined = item.getAssociatedPackage();

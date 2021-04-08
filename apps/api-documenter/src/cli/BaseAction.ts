@@ -23,13 +23,13 @@ export interface IBuildApiModelResult {
 }
 
 export abstract class BaseAction extends CommandLineAction {
-  protected inputFolder: string;
-  protected outputFolder: string;
-  protected configPath: string;
+  protected inputFolder!: string;
+  protected outputFolder!: string;
+  protected configPath!: string;
 
-  private _inputFolderParameter: CommandLineStringParameter;
-  private _outputFolderParameter: CommandLineStringParameter;
-  private _configPathParameter: CommandLineStringParameter;
+  private _inputFolderParameter!: CommandLineStringParameter;
+  private _outputFolderParameter!: CommandLineStringParameter;
+  private _configPathParameter!: CommandLineStringParameter;
 
   protected onDefineParameters(): void {
     // override
@@ -89,7 +89,11 @@ export abstract class BaseAction extends CommandLineAction {
 
     this._applyInheritDoc(apiModel, apiModel);
 
-    return { apiModel, inputFolder, outputFolder };
+    return {
+      apiModel: apiModel,
+      inputFolder: this.inputFolder,
+      outputFolder: this.outputFolder
+    };
   }
 
   // TODO: This is a temporary workaround.  The long term plan is for API Extractor's DocCommentEnhancer

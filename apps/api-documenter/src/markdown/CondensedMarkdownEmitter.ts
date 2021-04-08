@@ -15,13 +15,13 @@ import { DocEmphasisSpan } from '../nodes/DocEmphasisSpan';
 import { MarkdownEmitter, IMarkdownEmitterContext, IMarkdownEmitterOptions } from './MarkdownEmitter';
 import { IndentedWriter } from '../utils/IndentedWriter';
 
-export interface ICustomMarkdownEmitterOptions extends IMarkdownEmitterOptions {
+export interface ICondensedMarkdownEmitterOptions extends IMarkdownEmitterOptions {
   contextApiItem: ApiItem | undefined;
 
   onGetFilenameForApiItem: (apiItem: ApiItem) => string | undefined;
 }
 
-export class CustomMarkdownEmitter extends MarkdownEmitter {
+export class CondensedMarkdownEmitter extends MarkdownEmitter {
   private _apiModel: ApiModel;
 
   public constructor(apiModel: ApiModel) {
@@ -33,7 +33,7 @@ export class CustomMarkdownEmitter extends MarkdownEmitter {
   public emit(
     stringBuilder: StringBuilder,
     docNode: DocNode,
-    options: ICustomMarkdownEmitterOptions
+    options: ICondensedMarkdownEmitterOptions
   ): string {
     return super.emit(stringBuilder, docNode, options);
   }
@@ -117,9 +117,9 @@ export class CustomMarkdownEmitter extends MarkdownEmitter {
   /** @override */
   protected writeLinkTagWithCodeDestination(
     docLinkTag: DocLinkTag,
-    context: IMarkdownEmitterContext<ICustomMarkdownEmitterOptions>
+    context: IMarkdownEmitterContext<ICondensedMarkdownEmitterOptions>
   ): void {
-    const options: ICustomMarkdownEmitterOptions = context.options;
+    const options: ICondensedMarkdownEmitterOptions = context.options;
 
     const result: IResolveDeclarationReferenceResult = this._apiModel.resolveDeclarationReference(
       docLinkTag.codeDestination!,

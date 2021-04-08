@@ -10,15 +10,14 @@ import { ExperimentalYamlDocumenter } from '../documenters/ExperimentalYamlDocum
 
 import { FileSystem } from '@rushstack/node-core-library';
 import { CondensedMarkdownDocumenter } from '../documenters/CondensedMarkdownDocumenter';
+import { GenerateAction } from './GenerateAction';
 
-export class GenerateAction extends BaseAction {
+export class CondensedMarkdownAction extends BaseAction {
   public constructor(parser: ApiDocumenterCommandLine) {
     super({
-      actionName: 'generate',
+      actionName: 'markdown-min',
       summary: 'EXPERIMENTAL',
-      documentation:
-        'EXPERIMENTAL - This action is a prototype of a new config file driven mode of operation for' +
-        ' API Documenter.  It is not ready for general usage yet.  Its design may change in the future.'
+      documentation: 'EXPERIMENTAL'
     });
   }
 

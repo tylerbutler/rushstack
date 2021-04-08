@@ -2,6 +2,7 @@
 // See LICENSE in the project root for license information.
 
 import { CommandLineParser } from '@rushstack/ts-command-line';
+import { CondensedMarkdownAction } from './CondensedMarkdownAction';
 import { MarkdownAction } from './MarkdownAction';
 import { YamlAction } from './YamlAction';
 import { GenerateAction } from './GenerateAction';
@@ -24,6 +25,7 @@ export class ApiDocumenterCommandLine extends CommandLineParser {
 
   private _populateActions(): void {
     this.addAction(new MarkdownAction(this));
+    this.addAction(new CondensedMarkdownAction(this));
     this.addAction(new YamlAction(this));
     this.addAction(new GenerateAction(this));
   }

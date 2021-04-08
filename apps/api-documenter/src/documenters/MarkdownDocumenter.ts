@@ -59,6 +59,7 @@ import {
 } from '../plugin/MarkdownDocumenterFeature';
 import { DocumenterConfig } from './DocumenterConfig';
 import { MarkdownDocumenterAccessor } from '../plugin/MarkdownDocumenterAccessor';
+import { MarkdownEmitter } from '../markdown/MarkdownEmitter';
 
 export interface IMarkdownDocumenterOptions {
   apiModel: ApiModel;
@@ -74,7 +75,7 @@ export class MarkdownDocumenter {
   protected readonly _apiModel: ApiModel;
   protected readonly _documenterConfig: DocumenterConfig | undefined;
   protected _tsdocConfiguration: TSDocConfiguration;
-  protected readonly _markdownEmitter: CustomMarkdownEmitter;
+  protected _markdownEmitter: MarkdownEmitter;
   protected _outputFolder: string;
   protected _pluginLoader: PluginLoader;
 
