@@ -21,6 +21,16 @@ export class DocumenterConfig {
   public readonly newlineKind: NewlineKind;
 
   /**
+   * Specifies a custom URI root in case the documentation links should be customized.
+   */
+  public uriRoot?: string;
+
+  /**
+   * Specifies how packages must start to be included, so non matching package names are excluded.
+   */
+  public onlyPackagesStartingWith?: string[];
+
+  /**
    * The JSON Schema for API Extractor config file (api-extractor.schema.json).
    */
   public static readonly jsonSchema: JsonSchema = JsonSchema.fromFile(
@@ -47,6 +57,9 @@ export class DocumenterConfig {
         this.newlineKind = NewlineKind.CrLf;
         break;
     }
+
+    this.uriRoot = configFile.uriRoot;
+    this.onlyPackagesStartingWith = configFile.onlyPackagesStartingWith;
   }
 
   /**

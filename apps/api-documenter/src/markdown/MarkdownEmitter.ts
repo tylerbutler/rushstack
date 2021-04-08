@@ -27,6 +27,7 @@ export interface IMarkdownEmitterOptions {}
 export interface IMarkdownEmitterContext<TOptions = IMarkdownEmitterOptions> {
   writer: IndentedWriter;
   insideTable: boolean;
+  insideHTML: boolean;
 
   boldRequested: boolean;
   italicRequested: boolean;
@@ -48,6 +49,7 @@ export class MarkdownEmitter {
     const context: IMarkdownEmitterContext = {
       writer,
       insideTable: false,
+      insideHTML: false,
 
       boldRequested: false,
       italicRequested: false,
@@ -68,7 +70,8 @@ export class MarkdownEmitter {
   protected getEscapedText(text: string): string {
     const textWithBackslashes: string = text
       .replace(/\\/g, '\\\\') // first replace the escape character
-      .replace(/[*#[\]_|`~]/g, (x) => '\\' + x) // then escape any special characters
+      .replace(/(?<!^#*)#|#(?!#* )/g, '\\#') // keep markdown headers (one or more # at start of line followed by ' ') but escape others
+      .replace(/[*[\]_|`~]/g, (x) => '\\' + x) // then escape any other special characters
       .replace(/---/g, '\\-\\-\\-') // hyphens only if it's 3 or more
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -162,7 +165,7 @@ export class MarkdownEmitter {
         writer.write(docFencedCode.language);
         writer.writeLine();
         writer.write(docFencedCode.code);
-        writer.writeLine();
+        writer.ensureNewLine();
         writer.writeLine('```');
         break;
       }
@@ -211,11 +214,16 @@ export class MarkdownEmitter {
     const linkText: string =
       docLinkTag.linkText !== undefined ? docLinkTag.linkText : docLinkTag.urlDestination!;
 
-    const encodedLinkText: string = this.getEscapedText(linkText.replace(/\s+/g, ' '));
-
-    context.writer.write('[');
-    context.writer.write(encodedLinkText);
-    context.writer.write(`](${docLinkTag.urlDestination!})`);
+    if (context.insideHTML) {
+      context.writer.write(
+        `<a href='${docLinkTag.urlDestination!.replace(/\.md$/, '/')}'>${linkText.replace(/\s+/g, ' ')}</a>`
+      );
+    } else {
+      const encodedLinkText: string = this.getEscapedText(linkText.replace(/\s+/g, ' '));
+      context.writer.write('[');
+      context.writer.write(encodedLinkText);
+      context.writer.write(`](${docLinkTag.urlDestination!})`);
+    }
   }
 
   protected writePlainText(text: string, context: IMarkdownEmitterContext): void {
@@ -252,7 +260,11 @@ export class MarkdownEmitter {
         writer.write('<i>');
       }
 
-      writer.write(this.getEscapedText(middle));
+      if (context.insideHTML) {
+        writer.write(middle);
+      } else {
+        writer.write(this.getEscapedText(middle));
+      }
 
       if (context.italicRequested) {
         writer.write('</i>');

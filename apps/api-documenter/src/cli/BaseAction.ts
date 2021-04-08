@@ -3,7 +3,7 @@
 
 import * as path from 'path';
 import * as tsdoc from '@microsoft/tsdoc';
-import colors from 'colors';
+import * as colors from 'colors';
 
 import { CommandLineAction, CommandLineStringParameter } from '@rushstack/ts-command-line';
 import { FileSystem } from '@rushstack/node-core-library';
@@ -14,6 +14,7 @@ import {
   ApiDocumentedItem,
   IResolveDeclarationReferenceResult
 } from '@microsoft/api-extractor-model';
+import { DocumenterConfig } from '../documenters/DocumenterConfig';
 
 export interface IBuildApiModelResult {
   apiModel: ApiModel;
@@ -22,8 +23,13 @@ export interface IBuildApiModelResult {
 }
 
 export abstract class BaseAction extends CommandLineAction {
-  private _inputFolderParameter!: CommandLineStringParameter;
-  private _outputFolderParameter!: CommandLineStringParameter;
+  protected inputFolder: string;
+  protected outputFolder: string;
+  protected configPath: string;
+
+  private _inputFolderParameter: CommandLineStringParameter;
+  private _outputFolderParameter: CommandLineStringParameter;
+  private _configPathParameter: CommandLineStringParameter;
 
   protected onDefineParameters(): void {
     // override
@@ -45,23 +51,38 @@ export abstract class BaseAction extends CommandLineAction {
         ` ANY EXISTING CONTENTS WILL BE DELETED!` +
         ` If omitted, the default is "./${this.actionName}"`
     });
+
+    this._configPathParameter = this.defineStringParameter({
+      parameterLongName: '--config',
+      parameterShortName: '-c',
+      argumentName: 'CONFIG',
+      description:
+        `Specifies the the path to the config file used by the generator.` +
+        ` If omitted, the default is "${DocumenterConfig.FILENAME}"`
+    });
+  }
+
+  protected setConfigPath(): void {
+    this.configPath = this._configPathParameter.value || DocumenterConfig.FILENAME;
   }
 
   protected buildApiModel(): IBuildApiModelResult {
     const apiModel: ApiModel = new ApiModel();
 
-    const inputFolder: string = this._inputFolderParameter.value || './input';
-    if (!FileSystem.exists(inputFolder)) {
-      throw new Error('The input folder does not exist: ' + inputFolder);
+    this.inputFolder = this._inputFolderParameter.value || './input';
+    if (!FileSystem.exists(this.inputFolder)) {
+      throw new Error('The input folder does not exist: ' + this.inputFolder);
     }
 
-    const outputFolder: string = this._outputFolderParameter.value || `./${this.actionName}`;
-    FileSystem.ensureFolder(outputFolder);
+    this.outputFolder = this._outputFolderParameter.value || `./${this.actionName}`;
+    FileSystem.ensureFolder(this.outputFolder);
 
-    for (const filename of FileSystem.readFolder(inputFolder)) {
+    this.setConfigPath();
+
+    for (const filename of FileSystem.readFolder(this.inputFolder)) {
       if (filename.match(/\.api\.json$/i)) {
         console.log(`Reading ${filename}`);
-        const filenamePath: string = path.join(inputFolder, filename);
+        const filenamePath: string = path.join(this.inputFolder, filename);
         apiModel.loadPackage(filenamePath);
       }
     }
