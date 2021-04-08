@@ -12,6 +12,8 @@ import { DocTableCell } from './DocTableCell';
 export interface IDocTableParameters extends IDocNodeParameters {
   headerCells?: ReadonlyArray<DocTableCell>;
   headerTitles?: string[];
+  cssClass?: string;
+  caption?: string;
 }
 
 /**
@@ -19,6 +21,8 @@ export interface IDocTableParameters extends IDocNodeParameters {
  */
 export class DocTable extends DocNode {
   public readonly header: DocTableRow;
+  public cssClass?: string;
+  public caption?: string;
 
   private _rows: DocTableRow[];
 
@@ -29,6 +33,8 @@ export class DocTable extends DocNode {
     this._rows = [];
 
     if (parameters) {
+      this.cssClass = parameters.cssClass;
+      this.caption = parameters.caption;
       if (parameters.headerTitles) {
         if (parameters.headerCells) {
           throw new Error(

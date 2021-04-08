@@ -75,7 +75,7 @@ export interface IConfigFile {
   /**
    * Specifies the output target.
    */
-  outputTarget: 'docfx' | 'markdown';
+  outputTarget: 'docfx' | 'markdown' | 'markdown-min';
 
   /**
    * Specifies what type of newlines API Documenter should use when writing output files.
@@ -86,6 +86,16 @@ export interface IConfigFile {
    * To use the OS's default newline kind, specify "os".
    */
   newlineKind?: 'crlf' | 'lf' | 'os';
+
+  /**
+   * Specifies a custom URI root in case the documentation links should be customized.
+   */
+  uriRoot?: string;
+
+  /**
+   * Specifies how packages must start to be included, so non matching package names are excluded.
+   */
+  onlyPackagesStartingWith?: string[];
 
   /**
    * This enables an experimental feature that will be officially released with the next major version

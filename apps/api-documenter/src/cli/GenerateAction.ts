@@ -10,6 +10,7 @@ import { ExperimentalYamlDocumenter } from '../documenters/ExperimentalYamlDocum
 
 import { FileSystem } from '@rushstack/node-core-library';
 import { MarkdownDocumenter } from '../documenters/MarkdownDocumenter';
+import { CondensedMarkdownDocumenter } from '../documenters/CondensedMarkdownDocumenter';
 
 export class GenerateAction extends BaseAction {
   public constructor(parser: ApiDocumenterCommandLine) {
@@ -43,8 +44,17 @@ export class GenerateAction extends BaseAction {
 
     const { apiModel, outputFolder } = this.buildApiModel();
 
-    if (documenterConfig.configFile.outputTarget === 'markdown') {
+    const target: string = documenterConfig.configFile.outputTarget;
+
+    if (target === 'markdown') {
       const markdownDocumenter: MarkdownDocumenter = new MarkdownDocumenter({
+        apiModel,
+        documenterConfig,
+        outputFolder
+      });
+      markdownDocumenter.generateFiles();
+    } else if (target === 'markdown-min') {
+      const markdownDocumenter: CondensedMarkdownDocumenter = new CondensedMarkdownDocumenter({
         apiModel,
         documenterConfig,
         outputFolder
