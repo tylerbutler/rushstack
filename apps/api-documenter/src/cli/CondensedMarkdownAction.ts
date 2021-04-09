@@ -10,7 +10,6 @@ import { ExperimentalYamlDocumenter } from '../documenters/ExperimentalYamlDocum
 
 import { FileSystem } from '@rushstack/node-core-library';
 import { CondensedMarkdownDocumenter } from '../documenters/CondensedMarkdownDocumenter';
-import { GenerateAction } from './GenerateAction';
 
 export class CondensedMarkdownAction extends BaseAction {
   public constructor(parser: ApiDocumenterCommandLine) {

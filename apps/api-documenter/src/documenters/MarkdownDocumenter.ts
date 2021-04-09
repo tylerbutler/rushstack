@@ -122,7 +122,7 @@ export class MarkdownDocumenter {
 
     const scopedName: string = apiItem.getScopedNameWithinPackage();
 
-    this.writeHeadings(apiItem, output, configuration, scopedName);
+    this._writeHeadings(apiItem, output, configuration, scopedName);
 
     if (ApiReleaseTagMixin.isBaseClassOf(apiItem)) {
       if (apiItem.releaseTag === ReleaseTag.Beta) {
@@ -279,12 +279,12 @@ export class MarkdownDocumenter {
     });
   }
 
-  protected writeHeadings(
+  protected _writeHeadings(
     apiItem: ApiItem,
     output: DocSection | DocParagraph,
     configuration: TSDocConfiguration,
     scopedName: string
-  ) {
+  ): void {
     switch (apiItem.kind) {
       case ApiItemKind.Class:
         output.appendNode(new DocHeading({ configuration, title: `${scopedName} class` }));
