@@ -1,6 +1,6 @@
 {
-  "name": "@microsoft/api-documenter",
-  "version": "7.13.23",
+  "name": "@tylerbu/api-documenter",
+  "version": "7.13.23-tylerbu-1",
   "description": "Read JSON files from api-extractor, generate documentation pages",
   "repository": {
     "type": "git",
@@ -9,7 +9,8 @@
   "homepage": "https://api-extractor.com/",
   "license": "MIT",
   "scripts": {
-    "build": "heft test --clean"
+    "build": "heft test --clean",
+    "pack-custom": "../../common/temp/pnpm-local/node_modules/.bin/pnpm pack"
   },
   "bin": {
     "api-documenter": "./bin/api-documenter"
