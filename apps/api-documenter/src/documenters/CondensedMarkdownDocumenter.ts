@@ -29,6 +29,7 @@ import {
   ApiReleaseTagMixin,
   ApiDocumentedItem,
   ApiClass,
+  ApiTypeParameterListMixin,
   ReleaseTag,
   ApiPropertyItem,
   ApiInterface,
@@ -188,12 +189,14 @@ export class CondensedMarkdownDocumenter extends MarkdownDocumenter {
         this._writeInterfaceTables(output, apiItem as ApiInterface);
         break;
       case ApiItemKind.Constructor:
-      case ApiItemKind.ConstructSignature:
       case ApiItemKind.Method:
       case ApiItemKind.MethodSignature:
       case ApiItemKind.Function:
         this._writeParameterTables(output, apiItem as ApiParameterListMixin);
         this._writeThrowsSection(output, apiItem);
+        break;
+      case ApiItemKind.ConstructSignature:
+        console.log(`construct signature: ${apiItem as ApiTypeParameterListMixin}`);
         break;
       case ApiItemKind.Namespace:
         this._writePackageOrNamespaceTables(output, apiItem as ApiNamespace);
